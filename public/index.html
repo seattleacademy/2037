@@ -1,1 +1,147 @@
-hello world
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>2037 bots</title>
+    <style>
+    #myCanvas {
+        background: pink;
+    }
+    </style>
+</head>
+
+<body>
+    <div>Score: <span id="theScore">0</span></div>
+    <canvas id="myCanvas" width="600" height="400">
+        Your browser does not support canvas!
+    </canvas>
+    <script>
+    var canvas = document.getElementById("myCanvas");
+    var ctx = canvas.getContext("2d");
+
+    let bots = [];
+
+    function makeBot() {
+        let bot = {};
+        bot.x = Math.random() * canvas.width;
+        bot.y = Math.random() * canvas.height;
+        bot.r = Math.random() * 18 + 2;
+        bot.dx = Math.random() * 10 - 5;
+        bot.dy = Math.random() * 10 - 5;
+        bot.theta = Math.atan2(bot.dy, bot.dx);
+
+        bot.color = "#ffff66"
+        return bot;
+
+    }
+
+    for (counter = 0; counter < 3; counter++) {
+        bots.push(makeBot());
+    }
+    bots[0].color = "lime";
+    bots[0].port = 1500;
+
+    function addOne(bot) {
+        //console.log(bot)
+        if (bot.color == "lime") {
+            let score = document.getElementById("theScore").textContent;
+            score = Number(score) + 1;
+            document.getElementById("theScore").textContent = score;
+        }
+    }
+
+    console.log(bots)
+
+    function drawBot(bot) {
+
+        bot.x = bot.x + bot.dx;
+        bot.y = bot.y + bot.dy;
+        bot.theta = Math.atan2(bot.dy, bot.dx);
+
+        if (bot.y < 0 + bot.r) {
+            bot.dy = Math.abs(bot.dy);
+            addOne(bot);
+        }
+
+        if (bot.x < 0 + bot.r) {
+            bot.dx = Math.abs(bot.dx);
+        }
+
+        if (bot.x > canvas.width - bot.r) {
+            bot.dx = -Math.abs(bot.dx);
+        }
+
+        if (bot.y > canvas.height - bot.r) {
+            bot.dy = -Math.abs(bot.dy);
+        }
+
+        ctx.beginPath()
+        ctx.fillStyle = bot.color;
+        ctx.arc(bot.x, bot.y, bot.r, 0 * Math.PI, 2 * Math.PI);
+        ctx.fill();
+        ctx.stroke();
+        ctx.moveTo(bot.x, bot.y);
+        ctx.lineTo(
+            bot.x + Math.cos(bot.theta) * bot.r,
+            bot.y + Math.sin(bot.theta) * bot.r
+        )
+        ctx.stroke();
+    }
+
+    function drawBots() {
+        for (i = 0; i < bots.length; i++) {
+            for (j = 0; j < bots.length; j++) {
+                if (i == j) continue;
+                xdiffsq = (bots[i].x - bots[j].x) ** 2;
+                ydiffsq = (bots[i].y - bots[j].y) ** 2;
+                dist = Math.sqrt(xdiffsq + ydiffsq);
+                sumr = bots[i].r + bots[j].r;
+                if (dist < sumr) {
+                    console.log("collision")
+                    bots[i].dx = -bots[i].dx
+                    bots[i].dy = -bots[i].dy
+                    if (i == 0) {
+                        addOne(bots[0]);
+                    }
+                }
+            }
+        }
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (i = 0; i < bots.length; i++) {
+            drawBot(bots[i]);
+        }
+    }
+    drawBots();
+    setInterval(drawBots, 500);
+
+    let acceleration = 1;
+
+    function onKeyDown(evt) {
+        console.log(evt);
+        if (evt.key == "w") {
+            bots[0].dy = bots[0].dy - acceleration;
+        }
+        if (evt.key == "s") {
+            bots[0].dy = bots[0].dy + acceleration;
+        }
+
+        if (evt.key == "a") {
+            bots[0].dx = bots[0].dx - acceleration;
+        }
+
+        if (evt.key == "d") {
+            bots[0].dx = bots[0].dx + acceleration;
+        }
+
+        if (evt.key == "b") {
+            bots[0].r = bots[0].r + 1;
+        }
+
+    }
+
+    document.addEventListener("keydown", onKeyDown);
+    </script>
+</body>
+
+</html>

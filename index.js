@@ -14,4 +14,11 @@ app.use(jsonParser);
 
 app.use('', express.static('public', { 'index': false }), serveIndex('public', { 'icons': true }))
 
+app.all('/set', function(req, res) {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    bot = req.query || req.body;
+    console.log(bot)
+    res.send(JSON.stringify(bot));
+});
+
 app.listen(port, () => console.log(`Server listening at https://math.seattleacademy.org/${port} or http://math.seattleacademy.org:${port}`))
