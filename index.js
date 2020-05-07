@@ -1,4 +1,5 @@
 const express = require('express')
+const serveIndex = require('serve-index')
 const app = express()
 
 const port = process.env.PORT;
@@ -7,6 +8,10 @@ if(!port){
 	process.exit();
 }
 
-app.get('/', (req, res) => res.send('Hello World!'))
+const bodyParser = require('body-parser');
+var jsonParser = bodyParser.json({limit: '50mb' })
+app.use(jsonParser);
 
-app.listen(port, () => console.log(`Example app listening at https://math.seattleacademy.org/${port}`))
+app.use('', express.static('public', { 'index': false }), serveIndex('public', { 'icons': true }))
+
+app.listen(port, () => console.log(`Server listening at https://math.seattleacademy.org/${port} or http://math.seattleacademy.org:${port}`))
